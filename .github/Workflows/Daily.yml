@@ -1,0 +1,40 @@
+name: Run Build Pulse Autonomous Bot
+
+# Triggers the job every morning automatically at 8:00 AM IST (2:30 AM UTC) 
+# Also includes a manual button trigger so you can test it live instantly!
+on:
+  schedule:
+    - cron: '30 2 * * *'
+  workflow_dispatch:
+
+jobs:
+  build-and-run:
+    runs-on: ubuntu-latest
+
+    steps:
+    # Step 1: Securely pull your project repository code files into the cloud container
+    - name: Checkout Repository Source Code
+      uses: actions/checkout@v3
+
+    # Step 2: Boot up a stable environment running isolated Python 3.11
+    - name: Set Up Python 3.11 Engine
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+
+    # Step 3: Install library requirements map cleanly via pip cache manager
+    - name: Install Project Dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+
+    # Step 4: Execute the main Python automation script on the container instance
+    - name: Execute Autonomous Bot Script
+      run: python bot.py
+
+    # Step 5: Extract the generated summary file and save it securely as a downloadable web asset
+    - name: Upload Daily Summary Artifact Report
+      uses: actions/upload-artifact@v3
+      with:
+        name: daily-execution-summary
+        path: daily_summary.txt
